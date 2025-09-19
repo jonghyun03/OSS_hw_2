@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/form_nostyle.html"
+    }
+  ]
+}
