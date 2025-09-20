@@ -71,7 +71,7 @@
 
         input[type=submit] {
             width: 100%;
-            background-color: #4CAF50;
+            background-color: #0d6efd;
             color: white;
             padding: 14px;
             margin: 8px 0;
@@ -335,7 +335,7 @@
                     <h3>Additional Information</h3>
 
                     <label for="deliveryDate">Preferred Delivery Date:</label>
-                    <input type="date" id="deliveryDate" name="deliveryDate">
+                    <input type="date" id="deliveryDate" name="deliveryDate" required>
 
                     <label for="comments">Special Instructions:</label>
                     <textarea id="comments" name="comments" rows="4" cols="50"
@@ -345,6 +345,36 @@
                 <input type="submit" value="Continue to checkout">
         </form>
     </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert('올바른 이메일 형식을 입력해주세요.');
+                document.getElementById('email').focus();
+                return;
+            }
+            
+            const zip = document.getElementById('zip').value.trim();
+            if (zip && !/^\d{5}$/.test(zip)) {
+                alert('ZIP 코드는 5자리 숫자여야 합니다.');
+                document.getElementById('zip').focus();
+                return;
+            }
+            
+            const cardNumber = document.getElementById('cardNumber').value.trim();
+            if (cardNumber && !/^[\d\s-]{16,19}$/.test(cardNumber.replace(/[\s-]/g, ''))) {
+                alert('올바른 신용카드 번호를 입력해주세요. 16자리 숫자여야 합니다.');
+                document.getElementById('cardNumber').focus();
+                return;
+            }
+            
+            alert('모든 정보가 올바르게 입력되었습니다!');
+            this.submit();
+        });
+    </script>
 </body>
 
 </html>
