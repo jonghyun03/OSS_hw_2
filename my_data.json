@@ -1,0 +1,88 @@
+{
+  "courses": [
+    {
+      "name": "자료구조",
+      "major": "컴퓨터공학",
+      "credit": "3",
+      "mandatory": true,
+      "id": "1"
+    },
+    {
+      "id": "2",
+      "name": "운영체제",
+      "major": "컴퓨터공학",
+      "credit": 3,
+      "mandatory": true
+    },
+    {
+      "id": "3",
+      "name": "데이터베이스",
+      "major": "컴퓨터공학",
+      "credit": 3,
+      "mandatory": false
+    },
+    {
+      "id": "4",
+      "name": "컴퓨터네트워크",
+      "major": "컴퓨터공학",
+      "credit": 3,
+      "mandatory": false
+    },
+    {
+      "id": "5",
+      "name": "AI개론",
+      "major": "컴퓨터공학",
+      "credit": 3,
+      "mandatory": true
+    },
+    {
+      "id": "6",
+      "name": "이산수학",
+      "major": "컴퓨터공학",
+      "credit": 3,
+      "mandatory": false
+    },
+    {
+      "id": "7",
+      "name": "선형대수학",
+      "major": "GLS",
+      "credit": 3,
+      "mandatory": false
+    },
+    {
+      "id": "8",
+      "name": "경영경제통계",
+      "major": "경영경제학부",
+      "credit": 3,
+      "mandatory": false
+    },
+    {
+      "id": "9",
+      "name": "오픈소스스튜디오",
+      "major": "컴퓨터공학",
+      "credit": 3,
+      "mandatory": true
+    },
+    {
+      "id": "10",
+      "name": "모바일앱개발",
+      "major": "컴퓨터공학",
+      "credit": 3,
+      "mandatory": false
+    },
+    {
+      "id": "11",
+      "name": "컴퓨터구조",
+      "major": "컴퓨터공학",
+      "credit": 3,
+      "mandatory": true
+    },
+    {
+      "id": "12",
+      "name": "캡스톤디자인",
+      "major": "컴퓨터공학",
+      "credit": 3,
+      "mandatory": true
+    }
+  ]
+}

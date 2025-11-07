@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Index</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="/hw2-2/my.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="page">
+    <h3>한동대학교 AI컴공심화 강의 목록</h3>
+    <div class="row">
+      <div class="col">
+        <div class="row">
+          <div class="col">과목명</div>
+          <div class="col">전공</div>
+          <div class="col">학점</div>
+          <div class="col">필수여부</div>
+          <div class="col">삭제</div>
+        </div>
+        <div id="courseGrid" class="row g-2"></div>
+      </div>
+      <div class="col" style="display: flex; flex-direction: column; gap: 50px;">
+        <div class="inputs">
+          <div class="col">
+            <input type="text" id="courseTitle" placeholder="과목명">
+          </div>
+          <div class="col">
+            <input type="text" id="courseMajor" placeholder="전공">
+          </div>
+          <input type="number" id="courseCredit" placeholder="학점" min="1" max="5" step="1" style="width: 50%;">
+          <div style="display: flex; gap: 30px;">
+            <div>
+              <input type="radio" id="courseMandatoryTrue" name="courseMandatory" value="true" checked>
+              <label for="courseMandatoryTrue">필수</label>
+            </div>
+            <div>
+              <input type="radio" id="courseMandatoryFalse" name="courseMandatory" value="false">
+              <label for="courseMandatoryFalse">선택</label>
+            </div>
+          </div>
+          <button id="addButton" onclick="addCourse()" style="width: 50%;">추가</button>
+        </div>
+
+        <div class="edit">
+          <div id="editDiv" class="col" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 50%;
+    }
+  </style>
+
+  <script>
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "http://localhost:3000/courses");
+    xhr.setRequestHeader("content-type", "application/json");
+    xhr.send();
+
+    let courses = [];
+
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        courses = JSON.parse(xhr.response);
+        renderTableRows(courses);
+      } else {
+        console.log(xhr.status, xhr.statusText);
+      }
+    };
+
+    function renderTableRows(items) {
+      const $grid = $("#courseGrid");
+      $grid.empty();
+      items.forEach(function (item) {
+        const $row = $(
+          `<div class="row g-2 mb-2 border-bottom pb-2">
+              <div class="col"><a href="#" onclick="editCourse(${item.id}); return false;" class="text-decoration-none">${item.name}</a></div>
+              <div class="col">${item.major}</div>
+              <div class="col">${item.credit}</div>
+              <div class="col">${item.mandatory ? "필수" : "선택"}</div>
+              <div class="col"><button onclick="deleteCourse(${item.id})">삭제</button></div>
+            </div>`
+        );
+        $grid.append($row);
+      });
+    }
+
+    function addCourse() {
+      const name = $("#courseTitle").val().trim();
+      const major = $("#courseMajor").val().trim();
+      const credit = $("#courseCredit").val().trim();
+
+      if (!name || !major || !credit) {
+        alert("비어있는 항목이 있어 강의 추가가 불가능합니다!");
+        return;
+      }
+
+      const maxId = courses.length > 0 ? Math.max(...courses.map(course => parseInt(course.id))) : 0;
+
+      const newCourse = {
+        id: (maxId + 1).toString(),
+        name: name,
+        major: major,
+        credit: credit,
+        mandatory: $('input[name="courseMandatory"]:checked').val() === "true",
+      };
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "http://localhost:3000/courses");
+      xhr.setRequestHeader("content-type", "application/json");
+      xhr.send(JSON.stringify(newCourse));
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          courses.push(JSON.parse(xhr.response));
+          renderTableRows(courses);
+          $("#courseTitle").val("");
+          $("#courseMajor").val("");
+          $("#courseCredit").val("");
+          $("#courseMandatoryTrue").prop("checked", true);
+          alert("강의 추가가 완료되었습니다!");
+        } else {
+          console.log(xhr.status, xhr.statusText);
+        }
+      };
+    }
+
+    function editCourse(id) {
+      const course = courses.find(course => course.id == id);
+      if (!course) return;
+
+      const $editDiv = $("#editDiv");
+      $editDiv.empty();
+      $editDiv.append(`
+        <div class="col">
+          <input type="text" id="editCourseTitle" value="${course.name}">
+        </div>
+        <div class="col">
+          <input type="text" id="editCourseMajor" value="${course.major}">
+        </div>
+        <div class="col">
+          <input type="number" id="editCourseCredit" value="${course.credit}">
+        </div>
+        <div class="col" style="display: flex; gap: 30px;">
+          <div>
+            <input type="radio" id="editCourseMandatoryTrue" name="editCourseMandatory" value="true" ${course.mandatory ? "checked" : ""}>
+            <label for="editCourseMandatoryTrue">필수</label>
+          </div>
+          <div>
+            <input type="radio" id="editCourseMandatoryFalse" name="editCourseMandatory" value="false" ${!course.mandatory ? "checked" : ""}>
+            <label for="editCourseMandatoryFalse">선택</label>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button id="cancelButton" onclick="cancelEdit()">취소</button>
+            <button id="editButton" onclick="updateCourse(${id})">수정</button>
+        </div>
+      `);
+    }
+
+
+    function updateCourse(id) {
+      const name = $("#editCourseTitle").val().trim();
+      const major = $("#editCourseMajor").val().trim();
+      const credit = $("#editCourseCredit").val().trim();
+
+      if (!name || !major || !credit) {
+        alert("비어있는 항목이 있어 강의 수정이 불가능합니다!");
+        return;
+      }
+
+      const mandatory = $('input[name="editCourseMandatory"]:checked').val() === "true";
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", `http://localhost:3000/courses/${id}`);
+      xhr.setRequestHeader("content-type", "application/json");
+      xhr.send(JSON.stringify({ name, major, credit, mandatory }));
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          courses = courses.map(course => course.id == id ? { ...course, name, major, credit, mandatory } : course);
+          renderTableRows(courses);
+          $("#editDiv").empty();
+          alert("강의 수정이 완료되었습니다!");
+        } else {
+          console.log(xhr.status, xhr.statusText);
+        }
+      };
+    }
+
+    function cancelEdit() {
+      $("#editDiv").empty();
+    }
+
+    function deleteCourse(id) {
+      if (!confirm("정말 삭제하시겠습니까?")) return;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("DELETE", `http://localhost:3000/courses/${id}`);
+      xhr.send();
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          courses = courses.filter(course => course.id !== id);
+          renderTableRows(courses);
+          alert("강의 삭제가 완료되었습니다!");
+        } else {
+          console.log(xhr.status, xhr.statusText);
+        }
+      };
+    }
+
+    renderTableRows(courses);
+  </script>
+</body>
+
+</html>
